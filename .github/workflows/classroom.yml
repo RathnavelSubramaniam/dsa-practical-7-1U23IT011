@@ -1,0 +1,50 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: test1
+      id: test1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: test1
+        setup-command: ''
+        command: javac LinkedList.java && java LinkedList
+        input: |-
+          1
+          2
+          3
+          4
+          5
+          NULL
+          2
+          66
+        expected-output: |-
+          ENTER INTEGERS TO CREATE NODES (ENTER A NON-INTEGER TO EXIT):
+          LINKED LIST CREATED
+          LINKED LIST BEFORE INSERTING
+          1 -> 2 -> 3 -> 4 -> 5 -> null
+          ENTER THE POSIITON WHERE YOU WANT TO INSERT
+          ENTER THE ELEMENT TO BE INSERTED:
+          ELEMENT INSERTED
+          LINKED LIST AFTER INSERTING
+          1 -> 66 -> 2 -> 3 -> 4 -> 5 -> null
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST1_RESULTS: "${{steps.test1.outputs.result}}"
+      with:
+        runners: test1
